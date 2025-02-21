@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>CMS . VM </title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div id="app" class="max-w-lg mx-auto bg-white p-6 rounded shadow-md text-center">
+    <div class="flex items-center justify-center gap-4 text-5xl font-bold text-red-600">
+      <!-- Giờ -->
+      <div class="min-w-[60px]">
+        <span>{{ hours }}</span>
+        <span class="text-base">h</span>
+      </div>
+      
+      <!-- Dấu : -->
+      <div class="font-normal text-gray-500">:</div>
+  
+      <!-- Phút -->
+      <div class="min-w-[60px]">
+        <span>{{ minutes }}</span>
+        <span class="text-base">m</span>
+      </div>
+  
+      <!-- Dấu : -->
+      <div class="font-normal text-gray-500">:</div>
+  
+      <!-- Giây -->
+      <div class="min-w-[60px]">
+        <span>{{ seconds }}</span>
+        <span class="text-base">s</span>
+      </div>
+  
+      <!-- Dấu : -->
+      <div class="font-normal text-gray-500">:</div>
+  
+      <!-- Mili-giây -->
+      <div class="min-w-[60px]">
+        <span>{{ milliseconds }}</span>
+        <span class="text-base">ms</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const endDateTime = new Date("2025-03-22T00:00:00");
+        
+        const hours = ref(0);
+        const minutes = ref(0);
+        const seconds = ref(0);
+        const milliseconds = ref(0);
+
+        function updateTime() {
+          const now = new Date();
+          let remain = endDateTime - now;
+
+          // Nếu đã qua mốc end
+          if (remain <= 0) {
+            hours.value = 0;
+            minutes.value = 0;
+            seconds.value = 0;
+            milliseconds.value = 0;
+            return;
+          }
+
+          // Tính toán hours, minutes, seconds, ms
+          let tmp = remain;
+          hours.value = Math.floor(tmp / 3600000);   // 1h = 3600000 ms
+          tmp = tmp % 3600000;
+
+          minutes.value = Math.floor(tmp / 60000);   // 1m = 60000 ms
+          tmp = tmp % 60000;
+
+          seconds.value = Math.floor(tmp / 1000);    // 1s = 1000 ms
+          tmp = tmp % 1000;
+
+          milliseconds.value = tmp;                  // phần dư còn lại
+        }
+
+        onMounted(() => {
+          updateTime(); // Cập nhật ngay khi load
+          setInterval(updateTime, 50); // Cập nhật mỗi 50ms
+        });
+
+        return {
+          hours, minutes, seconds, milliseconds
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
