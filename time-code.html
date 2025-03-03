@@ -2,13 +2,22 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>CMS . VM </title>
+  <title>Countdown theo ngày</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4">
   <div id="app" class="max-w-lg mx-auto bg-white p-6 rounded shadow-md text-center">
     <div class="flex items-center justify-center gap-4 text-5xl font-bold text-red-600">
+      <!-- Ngày -->
+      <div class="min-w-[80px]">
+        <span>{{ days }}</span>
+        <span class="text-base">ngày</span>
+      </div>
+
+      <!-- Dấu : -->
+      <div class="font-normal text-gray-500">:</div>
+
       <!-- Giờ -->
       <div class="min-w-[60px]">
         <span>{{ hours }}</span>
@@ -49,8 +58,11 @@
 
     createApp({
       setup() {
+        // Thay đổi mốc thời gian ở đây
         const endDateTime = new Date("2025-03-22T00:00:00");
-        
+
+        // Khai báo biến phản ứng
+        const days = ref(0);
         const hours = ref(0);
         const minutes = ref(0);
         const seconds = ref(0);
@@ -62,6 +74,7 @@
 
           // Nếu đã qua mốc end
           if (remain <= 0) {
+            days.value = 0;
             hours.value = 0;
             minutes.value = 0;
             seconds.value = 0;
@@ -69,27 +82,38 @@
             return;
           }
 
-          // Tính toán hours, minutes, seconds, ms
+          // Tính toán days, hours, minutes, seconds, ms
           let tmp = remain;
-          hours.value = Math.floor(tmp / 3600000);   // 1h = 3600000 ms
+
+          // 1 ngày = 86400000 ms
+          days.value = Math.floor(tmp / 86400000);
+          tmp = tmp % 86400000;
+
+          // 1 giờ = 3600000 ms
+          hours.value = Math.floor(tmp / 3600000);
           tmp = tmp % 3600000;
 
-          minutes.value = Math.floor(tmp / 60000);   // 1m = 60000 ms
+          // 1 phút = 60000 ms
+          minutes.value = Math.floor(tmp / 60000);
           tmp = tmp % 60000;
 
-          seconds.value = Math.floor(tmp / 1000);    // 1s = 1000 ms
+          // 1 giây = 1000 ms
+          seconds.value = Math.floor(tmp / 1000);
           tmp = tmp % 1000;
 
-          milliseconds.value = tmp;                  // phần dư còn lại
+          // phần còn lại là mili-giây
+          milliseconds.value = tmp;
         }
 
+        // Cập nhật ngay khi load trang + cứ 50ms lại cập nhật 1 lần
         onMounted(() => {
-          updateTime(); // Cập nhật ngay khi load
-          setInterval(updateTime, 50); // Cập nhật mỗi 50ms
+          updateTime();
+          setInterval(updateTime, 50);
         });
 
+        // Trả về để hiển thị trên template
         return {
-          hours, minutes, seconds, milliseconds
+          days, hours, minutes, seconds, milliseconds
         };
       }
     }).mount('#app');
